@@ -46,6 +46,14 @@ To check all streams (ADS or file's main stream) present in all files in a speci
 
     Get-Item -Path "C:\Path\Directory_Name\*" -Stream '*' | Select -Property Stream, Length, PSChildName
     
+To check only the ADS of all files in a specific directory subtree, use the following PowerShell sequence of commands:
+
+    $ads = Get-ChildItem -Path 'C:\Path\Directory_Name\' -Recurse | ForEach-Object { Get-Item $_.FullName -Stream * } | 
+           Where-Object Stream -ne ':$Data' | Select-Object -Property FileName, Stream, Length,  
+           @{n='CreationTime';e={(Get-Item $_.FileName).CreationTime}}
+           
+    $ads | Out-GridView 
+    
     
 Using 'dir' command:
 -------
@@ -65,9 +73,9 @@ To check if there is any file with ADS in a specific directory subtree, use the 
 Interesting facts:
 ------------------
 
-  *) if you delete a file with ADS and restore it from "$Recycle.Bin" all the ADS's will also be restored;
+  - if you delete a file with ADS and restore it from "$Recycle.Bin" all the ADS's will also be restored;
   
-  *) if you compact the file and then extract it again, the ADS's shall not be restored; - even when compacting with Windows File Browser and "extracting" the file by copying from Windows File Browser, no ADS is restored -
+  - if you compact the file and then extract it again, the ADS's shall not be restored; - even when compacting with Windows File Browser and "extracting" the file by copying from Windows File Browser, no ADS is restored -
 
 
 Vinicius Calil, 2020-04-22
